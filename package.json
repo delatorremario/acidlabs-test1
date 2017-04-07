@@ -1,0 +1,25 @@
+{
+  "name": "acidlabs-test1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "hapi": "^16.1.1",
+    "inert": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delatorremario/acidlabs-test1.git"
+  },
+  "author": "MARIO DE LA TORRE",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/delatorremario/acidlabs-test1/issues"
+  },
+  "homepage": "https://github.com/delatorremario/acidlabs-test1#readme"
+}
