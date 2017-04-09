@@ -9,38 +9,39 @@ server.connection({
     port: 8000 
 });
 
-// Add the route
-server.route({
+// Add the API route
+/*server.route({
     method: 'GET',
     path:'/name/{name}', 
     handler: function (request, reply) {
         reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
     }
 });
+*/
 
 //Statics Pages
-server.register(require('inert'), (err) => {
+server.register([require('inert')], (err) => {
 
     if (err) {
         throw err;
     }
 
-    server.route({
+    server.route([{
         method: 'GET',
-        path: '/helloworld',
-        handler: function (request, reply) {
-            reply.file('./public/hello.html');
+        path: '/',
+        handler: {file:'index.html'}
+    }]);
+
+    // Start the server
+    server.start((err) => {
+
+        if (err) {
+            throw err;
         }
+        console.log('Server running at:',server.info.uri);
     });
+
 });
 
-// Start the server
-server.start((err) => {
-
-    if (err) {
-        throw err;
-    }
-    console.log('Server running at:',server.info.uri);
-});
-
+module.exports = server;
 
