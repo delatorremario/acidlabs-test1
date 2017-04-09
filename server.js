@@ -1,3 +1,4 @@
+
 'use strict';
 
 const Hapi = require('hapi');
@@ -26,11 +27,10 @@ server.register([require('inert')], (err) => {
         throw err;
     }
 
-    server.route([{
-        method: 'GET',
-        path: '/',
-        handler: {file:'index.html'}
-    }]);
+    server.route([
+            {method: 'GET',path: '/',handler: {file:'index.html'}},
+            {method: 'GET',path: '/client.js',handler: {file:'./lib/client.js'}},
+        ]);
 
     // Start the server
     server.start((err) => {
@@ -38,7 +38,10 @@ server.register([require('inert')], (err) => {
         if (err) {
             throw err;
         }
-        console.log('Server running at:',server.info.uri);
+        require('./lib/get_stock').init(server.listener,()=>{
+            console.log('Server running at:',server.info.uri);
+        });
+        
     });
 
 });
