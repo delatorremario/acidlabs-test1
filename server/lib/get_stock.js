@@ -23,6 +23,7 @@ const requireStock = (callback)=>{
         request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
                 if (err) {
                     console.log(err);
+                    return
                 }
                 switch(res.statusCode) {
                     case 200:

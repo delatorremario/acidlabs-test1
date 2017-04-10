@@ -37,6 +37,7 @@ class App extends Component {
     selectedStock:null
   };
 
+
   render() {
     const state = this.state;
     return (
