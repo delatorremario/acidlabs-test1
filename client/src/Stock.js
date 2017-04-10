@@ -1,4 +1,3 @@
 import React from 'react';
-
-export default ({ name, value }) =>
-   <p>{name}: {value}</p>
+export default ({ stock, onClick }) =>
+   <p onClick={onClick}>{stock.l}: {stock.c}</p>
