@@ -21,7 +21,7 @@ server.connection({
 */
 
 //Statics Pages
-server.register([require('inert')], (err) => {
+server.register([require('inert'), require('hapi-error')], (err) => {
 
     if (err) {
         throw err;
