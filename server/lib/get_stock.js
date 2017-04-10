@@ -3,7 +3,7 @@ const _ = require('lodash');
 const redisClient = require('redis-connection')();
 const redisSub = require('redis-connection')('subscriber');
 const request = require('request');
-const handleError = require('hapi-error').handleError;
+//const handleError = require('hapi-error').handleError;
 
 const SocketIO = require('socket.io');
 let io;
@@ -20,9 +20,9 @@ const pushStock = (data) => {
 
 const requireStock = (callback)=>{
         //get info from API: http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F
-        request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', function(err, res, content) {
+        request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
                 if (err) {
-                    handleError(err);
+                    console.log(err);
                 }
                 switch(res.statusCode) {
                     case 200:
@@ -30,9 +30,9 @@ const requireStock = (callback)=>{
                         let stocks = JSON.parse(new_content);
                         return callback(stocks); 
                     case 404: 
-                       return handleError('404 not found');
+                       return console.log('404 not found');
                     default:
-                       return handleError('error 500');  
+                       return console.log('error 500');  
                 }
         });
 }
@@ -44,14 +44,14 @@ const compareStock = (stocks)=>{
                    redisClient.lrange(stock.t,0,0,(err,data)=>{
                         if (err) {
                             redisClient.del(stock.t);
-                            return handleError(err);
+                            return console.log(err);
                         }
                         //verify changes on data stock
                         try{
                             let data_json=JSON.parse(data);
                             if(stock.l!=data_json.l) pushStock(stock); //save changes in redis
                         } catch(e){
-                            handleError(e);
+                            console.log(e);
                             pushStock(stock);
                         }
                 }); 
@@ -63,14 +63,14 @@ const getStockHandler = (socket)=>{
    _.each(stocks_names,(n)=>{
         redisClient.lrange(n,0,0,(err,data)=>{
             if (err) {
-                return handleError(err);
+                return console.log(err);
             }
             //verify changes on data stock
             try{
                 let data_json=JSON.parse(data);
                 redisClient.publish(n,data_json.l); 
             } catch(e){
-                handleError(e);
+                console.log(e);
             }
         });
     })
