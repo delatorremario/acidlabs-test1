@@ -10,12 +10,11 @@ let io;
 
 const stocks_names =   ['AAPL','ABC','MSFT','TSLA','F'];
 
-const pushStock = (data) => {
-    console.log('save changes',data.t);
-    _.extend(data,{timestamp: new Date()});
-    let new_data =   JSON.stringify(data);
-    redisClient.lpush(data.t,new_data);
-    redisClient.publish(data.t,data.l); 
+const pushStock = (stock) => {
+    console.log('save changes',stock.t,stock.l);
+    _.extend(stock,{timestamp: new Date()});
+    redisClient.lpush(stock.t,JSON.stringify(stock));
+    redisClient.publish(stock.t,stock); 
 } 
 
 const requireStock = (callback)=>{
@@ -61,15 +60,14 @@ const compareStock = (stocks)=>{
 
 const getStockHandler = (socket)=>{
 
-   _.each(stocks_names,(n)=>{
-        redisClient.lrange(n,0,0,(err,data)=>{
+   _.each(stocks_names,(stock_name)=>{
+        redisClient.lrange(stock_name,0,0,(err,stock)=>{
             if (err) {
                 return console.log(err);
             }
             //verify changes on data stock
             try{
-                let data_json=JSON.parse(data);
-                redisClient.publish(n,data_json.l); 
+               redisClient.publish(stock_name,stock); 
             } catch(e){
                 console.log(e);
             }
@@ -90,9 +88,9 @@ const init = (listener,callback)=>{
             })
             io = SocketIO.listen(listener);
             io.on('connection', getStockHandler);
-            redisSub.on('message', function (channel, message) {
+            redisSub.on('message',  (channel, message) => {
                 //console.log(channel + ' : ' + message);
-                io.emit(channel, message); // relay to all connected socket.io clients
+                io.emit(channel, JSON.parse(message)); // relay to all connected socket.io clients
             });
             return setTimeout(function () {
                 return callback();
