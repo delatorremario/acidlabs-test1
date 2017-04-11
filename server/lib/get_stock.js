@@ -43,8 +43,9 @@ const requireStock = (callback)=>{
                     handleError('How unfortunate! The API Request Failed','');
                 }
             });
-        
-        
+
+            //let new_content =[ { "id": "22144" ,"t" : "AAPL" ,"e" : "NASDAQ" ,"l" : "141.96" ,"l_fix" : "141.96" ,"l_cur" : "141.96" ,"s": "0" ,"ltt":"1:03PM EDT" ,"lt" : "Apr 11, 1:03PM EDT" ,"lt_dts" : "2017-04-11T13:03:53Z" ,"c" : "-1.21" ,"c_fix" : "-1.21" ,"cp" : "-0.85" ,"cp_fix" : "-0.85" ,"ccol" : "chr" ,"pcls_fix" : "143.17" } ,{ "id": "658010" ,"t" : "ABC" ,"e" : "NYSE" ,"l" : "87.30" ,"l_fix" : "87.30" ,"l_cur" : "87.30" ,"s": "0" ,"ltt":"1:02PM EDT" ,"lt" : "Apr 11, 1:02PM EDT" ,"lt_dts" : "2017-04-11T13:02:32Z" ,"c" : "-1.14" ,"c_fix" : "-1.14" ,"cp" : "-1.29" ,"cp_fix" : "-1.29" ,"ccol" : "chr" ,"pcls_fix" : "88.44" } ,{ "id": "358464" ,"t" : "MSFT" ,"e" : "NASDAQ" ,"l" : "65.53" ,"l_fix" : "65.53" ,"l_cur" : "65.53" ,"s": "0" ,"ltt":"1:03PM EDT" ,"lt" : "Apr 11, 1:03PM EDT" ,"lt_dts" : "2017-04-11T13:03:50Z" ,"c" : "0.00" ,"c_fix" : "0.00" ,"cp" : "0.00" ,"cp_fix" : "0.00" ,"ccol" : "chb" ,"pcls_fix" : "65.53" } ,{ "id": "12607212" ,"t" : "TSLA" ,"e" : "NASDAQ" ,"l" : "309.82" ,"l_fix" : "309.82" ,"l_cur" : "309.82" ,"s": "0" ,"ltt":"1:03PM EDT" ,"lt" : "Apr 11, 1:03PM EDT" ,"lt_dts" : "2017-04-11T13:03:52Z" ,"c" : "-2.57" ,"c_fix" : "-2.57" ,"cp" : "-0.82" ,"cp_fix" : "-0.82" ,"ccol" : "chr" ,"pcls_fix" : "312.39" } ,{ "id": "13606" ,"t" : "F" ,"e" : "NYSE" ,"l" : "11.24" ,"l_fix" : "11.24" ,"l_cur" : "11.24" ,"s": "0" ,"ltt":"1:03PM EDT" ,"lt" : "Apr 11, 1:03PM EDT" ,"lt_dts" : "2017-04-11T13:03:34Z" ,"c" : "-0.01" ,"c_fix" : "-0.01" ,"cp" : "-0.04" ,"cp_fix" : "-0.04" ,"ccol" : "chr" ,"pcls_fix" : "11.25" } ]
+            //return callback(new_content);
 }
 
 const compareStock = (stocks)=>{
@@ -68,21 +69,25 @@ const compareStock = (stocks)=>{
         });
 }
 
-const getStockHandler = (socket)=>{
+const getStockHandler = (socket) => {
 
     //show last data saved
-   _.each(stocks_names,(stock_name)=>{ 
-        redisClient.lrange(stock_name,0,0,(err,stock)=>{
-            console.log('stock',stock_name,JSON.parse(stock));
+   _.each(stocks_names,(stock_name) => { 
+       //publish last update
+        redisClient.lrange(stock_name,0,0,(err,stock) => {
             if (err) {
                 return console.log(err);
             }
-            //verify changes on data stock
-            try{
-               redisClient.publish(stock_name,stock); 
-            } catch(e){
-                console.log(e);
+            redisClient.publish(stock_name,stock); 
+        });
+  
+        //publish list last 10 updates
+         redisClient.lrange(stock_name,0,10,(err,stocks) => {
+            if (err) {
+                return console.log(err);
             }
+            let history_name = 'history_' + stock_name;
+            redisClient.publish(history_name,JSON.stringify(stocks)); 
         });
     })
              
@@ -100,13 +105,15 @@ const init = (listener,callback)=>{
             //subscribe to errors
             redisSub.subscribe('error');
 
-            _.each(stocks_names,(n)=>{
-                redisSub.subscribe(n);
+            _.each(stocks_names,(name)=>{
+                redisSub.subscribe(name);
+                 let history_name = 'history_' + name;
+                 redisSub.subscribe(history_name);
             })
             io = SocketIO.listen(listener);
             io.on('connection', getStockHandler);
             redisSub.on('message',  (channel, message) => {
-                //console.log(channel + ' : ' + message);
+               //console.log(channel + ' : ' + message);
                io.emit(channel, JSON.parse(message)); // relay to all connected socket.io clients
             });
             return setTimeout(function () {
