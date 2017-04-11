@@ -27,7 +27,7 @@ class App extends Component {
         let list = array_strings.map(value => JSON.parse(value));
         let histories=this.state.histories;
         histories[stockName]=list;
-        this.setState({ 'histories': histories});
+        this.setState({ histories});
       });
     });
     this.socket.on('error', (error) => {

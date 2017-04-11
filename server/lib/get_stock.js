@@ -14,7 +14,16 @@ const pushStock = (stock) => {
     console.log('save changes',stock.t,stock.l);
     _.extend(stock,{timestamp: new Date()});
     redisClient.lpush(stock.t,JSON.stringify(stock));
+    redisClient.lrange(stock.t,0,10,(err,stocks) => {
+            if (err) {
+                return console.log(err);
+            }
+            let history_name = 'history_' + stock.t;
+            redisClient.publish(history_name,JSON.stringify(stocks)); 
+    });
+
     redisClient.publish(stock.t,JSON.stringify(stock)); 
+    
     redisClient.publish('error',JSON.stringify({show:false})); //clear message 
 } 
 
@@ -86,6 +95,7 @@ const getStockHandler = (socket) => {
             if (err) {
                 return console.log(err);
             }
+            console.log(stocks);
             let history_name = 'history_' + stock_name;
             redisClient.publish(history_name,JSON.stringify(stocks)); 
         });
