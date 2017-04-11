@@ -2,7 +2,7 @@ import React from 'react';
 import {Panel, Button, Table} from 'react-bootstrap';
 
 export default ({ stock, onClick }) =>{
-        const title = <div><h6>{stock.t} - {stock.lt} </h6><span><h5>{stock.e}</h5></span></div>
+        const title = <div><h6>{stock.e} - {stock.lt} </h6><span><h5>{stock.t}</h5></span></div>
 
         return <div>
         

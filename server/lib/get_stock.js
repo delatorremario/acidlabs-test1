@@ -14,14 +14,16 @@ const pushStock = (stock) => {
     console.log('save changes',stock.t,stock.l);
     _.extend(stock,{timestamp: new Date()});
     redisClient.lpush(stock.t,JSON.stringify(stock));
-    redisClient.publish(stock.t,stock); 
+    redisClient.publish(stock.t,JSON.stringify(stock)); 
+    redisClient.publish('error',JSON.stringify({show:false})); //clear message 
 } 
 
 const requireStock = (callback)=>{
         //service without notifications 
+        if (Math.random(0, 1) < 0.1) throw new Error('How unfortunate! The API Request Failed')
         request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
                 if (err) {
-                    console.log(err);
+                    handleError('Can not access to Google finance', 'The API Request Failed. Showing the last update');
                     return
                 }
                 switch(res.statusCode) {
@@ -30,9 +32,9 @@ const requireStock = (callback)=>{
                         let stocks = JSON.parse(new_content);
                         return callback(stocks); 
                     case 404: 
-                       return console.log('404 not found');
+                       return handleError('Can not to access Google finance', 'Error 404 not found. Showing the last update');
                     default:
-                       return console.log('error 500');  
+                       return handleError('Can not to access Google finance', 'Error 500. Showing the last update'); 
                 }
         });
 }
@@ -68,7 +70,7 @@ const getStockHandler = (socket)=>{
             }
             //verify changes on data stock
             try{
-               redisClient.publish(stock_name,stock); 
+               redisClient.publish(stock_name,JSON.stringify(stock)); 
             } catch(e){
                 console.log(e);
             }
@@ -80,10 +82,15 @@ const getStockHandler = (socket)=>{
         requireStock(compareStock);
     },1000);
 }
+const handleError=(title,message) => redisClient.publish('error',JSON.stringify({title:title,message:message,show:true}));
+
 
 const init = (listener,callback)=>{
     redisClient.on('ready',()=>{
         redisSub.on('ready',()=>{
+            //subscribe to errors
+            redisSub.subscribe('error');
+
             _.each(stocks_names,(n)=>{
                 redisSub.subscribe(n);
             })
@@ -91,7 +98,7 @@ const init = (listener,callback)=>{
             io.on('connection', getStockHandler);
             redisSub.on('message',  (channel, message) => {
                 //console.log(channel + ' : ' + message);
-                io.emit(channel, JSON.parse(message)); // relay to all connected socket.io clients
+               io.emit(channel, JSON.parse(message)); // relay to all connected socket.io clients
             });
             return setTimeout(function () {
                 return callback();
