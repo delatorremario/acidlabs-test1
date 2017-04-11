@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import Stocks from './Stocks';
 import Message from './Message';
 import History from './History';
+import Header from './Header';
 
 import logo from './logo.svg';
 import './App.css';
@@ -15,9 +16,9 @@ class App extends Component {
   componentDidMount() {
     this.socket = io('http://localhost:8000');
     stocksNames.forEach((stockName) =>
-      this.socket.on(stockName, (value) => 
+      this.socket.on(stockName, (value) => {
         this.setState({ [stockName]: value })
-      )
+      })
     );
   }
 
@@ -39,12 +40,12 @@ class App extends Component {
 
 
   render() {
-    const state = this.state;
+    const state = this.state; 
     return (
       <div className="App">
+        <Header/>
         {state.message && <Message value={state.message} />}
-        <Stocks onSelectStock={(stock) => this.setState({ selectedStock: stock }) } stocks={stocksNames.map(stockName => ({ l: stockName, c: state[stockName] }))} />
-        {/*<Stocks stocks={stocksNames.map(stockName => state[stockName])} /> */}
+        <Stocks onSelectStock={(stock) => this.setState({ selectedStock: stock }) } stocks={stocksNames.map(stockName =>  state[stockName] )} />
         {state.selectedStock && <History value={state.histories[state.selectedStock]}/>}
       </div>
     );

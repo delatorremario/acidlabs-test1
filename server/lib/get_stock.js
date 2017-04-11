@@ -18,7 +18,7 @@ const pushStock = (stock) => {
 } 
 
 const requireStock = (callback)=>{
-        //get info from API: http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F
+        //service without notifications 
         request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
                 if (err) {
                     console.log(err);
@@ -60,7 +60,8 @@ const compareStock = (stocks)=>{
 
 const getStockHandler = (socket)=>{
 
-   _.each(stocks_names,(stock_name)=>{
+    //show last data saved
+   _.each(stocks_names,(stock_name)=>{ 
         redisClient.lrange(stock_name,0,0,(err,stock)=>{
             if (err) {
                 return console.log(err);
