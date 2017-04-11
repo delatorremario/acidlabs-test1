@@ -95,7 +95,6 @@ const getStockHandler = (socket) => {
             if (err) {
                 return console.log(err);
             }
-            console.log(stocks);
             let history_name = 'history_' + stock_name;
             redisClient.publish(history_name,JSON.stringify(stocks)); 
         });

@@ -63,7 +63,7 @@ class App extends Component {
         {state.error && state.error.show === true && <Error error={state.error} />}
         {state.message && <Message value={state.message} />}
         <Stocks onSelectStock={(stock) => this.setState({ selectedStock: stock })} stocks={stocksNames.map(stockName => state[stockName])} />
-        {state.selectedStock && <History value={state.histories[state.selectedStock]} />}
+        {state.selectedStock && <History  onClick={() => this.setState({selectedStock:null})} value={state.histories[state.selectedStock]} />}
       </div>
     );
   }
