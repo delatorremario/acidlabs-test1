@@ -13,8 +13,9 @@ class App extends Component {
 
   componentDidMount() {
     this.socket = io('http://localhost:8000');
-    this.socket.on('connect', function(){console.log('connect')});
-    this.socket.on('disconnect', function(){console.log('disconnect')});
+    this.socket.on('connect_error', () => this.setState({['error']:{title:'API not connected',message:'',show:true}}));
+
+    
     stocksNames.forEach((stockName) =>
       this.socket.on(stockName, (value) => {
         this.setState({ [stockName]: value })
