@@ -4,7 +4,6 @@ import io from 'socket.io-client';
 import Stocks from './Stocks';
 import Message from './Message';
 import History from './History';
-import Header from './Header';
 import Error from './Error';
 import './App.css';
 
@@ -14,13 +13,14 @@ class App extends Component {
 
   componentDidMount() {
     this.socket = io('http://localhost:8000');
+    this.socket.on('connect', function(){console.log('connect')});
+    this.socket.on('disconnect', function(){console.log('disconnect')});
     stocksNames.forEach((stockName) =>
       this.socket.on(stockName, (value) => {
         this.setState({ [stockName]: value })
       })
     );
     this.socket.on('error',(error) => {
-        console.log('error',error);
         this.setState({['error']:error})
     });
   }
@@ -47,11 +47,13 @@ class App extends Component {
     const state = this.state; 
     return (
       <div className="App">
-        <Header/>
-        {state.error && state.error.show===true && <Error error={state.error} />}
-        {state.message && <Message value={state.message} />}
-        <Stocks onSelectStock={(stock) => this.setState({ selectedStock: stock }) } stocks={stocksNames.map(stockName =>  state[stockName] )} />
-        {state.selectedStock && <History value={state.histories[state.selectedStock]}/>}
+        <div className="App-header">
+          <h2>Test for AcidLabs</h2>
+        </div>
+            {state.error && state.error.show===true && <Error error={state.error} />}
+            {state.message && <Message value={state.message} />}
+            <Stocks onSelectStock={(stock) => this.setState({ selectedStock: stock }) } stocks={stocksNames.map(stockName =>  state[stockName] )} />
+            {state.selectedStock && <History value={state.histories[state.selectedStock]}/>}
       </div>
     );
   }

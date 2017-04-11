@@ -20,8 +20,9 @@ const pushStock = (stock) => {
 
 const requireStock = (callback)=>{
         //service without notifications 
-        if (Math.random(0, 1) < 0.1) throw new Error('How unfortunate! The API Request Failed')
-        request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
+        try{
+            if (Math.random(0, 1) < 0.1) throw new Error('How unfortunate! The API Request Failed')
+            request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
                 if (err) {
                     handleError('Can not access to Google finance', 'The API Request Failed. Showing the last update');
                     return
@@ -36,7 +37,12 @@ const requireStock = (callback)=>{
                     default:
                        return handleError('Can not to access Google finance', 'Error 500. Showing the last update'); 
                 }
-        });
+            });
+        }catch(e){
+            console.log('error',e);
+            handleError('How unfortunate! The API Request Failed','');
+        }
+        
 }
 
 const compareStock = (stocks)=>{
