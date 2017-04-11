@@ -23,7 +23,7 @@ const requireStock = (callback)=>{
        
             request.get('http://finance.google.com/finance/info?client=ig&q=AAPL,ABC,MSFT,TSLA,F', (err, res, content) => {
                 try{
-                    if (Math.random(0, 1) < 0.1) throw new Error('How unfortunate! The API Request Failed')
+                    //if (Math.random(0, 1) < 0.1) throw new Error('How unfortunate! The API Request Failed')
                     if (err) {
                         handleError('Can not access to Google finance', 'The API Request Failed. Showing the last update');
                         return
@@ -73,12 +73,13 @@ const getStockHandler = (socket)=>{
     //show last data saved
    _.each(stocks_names,(stock_name)=>{ 
         redisClient.lrange(stock_name,0,0,(err,stock)=>{
+            console.log('stock',stock_name,JSON.parse(stock));
             if (err) {
                 return console.log(err);
             }
             //verify changes on data stock
             try{
-               redisClient.publish(stock_name,JSON.stringify(stock)); 
+               redisClient.publish(stock_name,stock); 
             } catch(e){
                 console.log(e);
             }
