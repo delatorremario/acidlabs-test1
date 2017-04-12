@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13",
     "react": "^15.5.3",
     "react-bootstrap": "^0.30.8",
     "react-dom": "^15.5.3",
+    "react-moment": "^0.2.2",
     "socket.io-client": "^1.7.3"
   },
   "devDependencies": {

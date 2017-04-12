@@ -1,5 +1,6 @@
 import React from 'react';
 import {Modal,Grid, Row, Col, Button} from 'react-bootstrap';
+import Moment from 'react-moment';
 
 
 export default ({value,onClick}) =>
@@ -11,15 +12,15 @@ export default ({value,onClick}) =>
         <h4>Last 10 updates</h4>
         <Grid>
             <Row className="show-grid">
-                <Col xs={3}>Timestamp</Col>
-                <Col xs={2}>l</Col>
-                <Col xs={2}>c</Col>
+                <Col xs={4} md={3}>Timestamp</Col>
+                <Col xs={3} md={2}>l</Col>
+                <Col xs={3} md={2}>c</Col>
             </Row>
             {value.map((stock,i) =>
               <Row key={i} className="show-grid">
-                <Col xs={3}>{stock.timestamp.toString()}</Col>
-                <Col xs={2}>{stock.l}</Col>
-                <Col xs={2}>{stock.c}</Col>
+                <Col xs={4} md={3}><Moment format='DD/MM/YYYY HH:mm:ss' date={stock.timestamp} /></Col>
+                <Col xs={3} md={2}>{stock.l}</Col>
+                <Col xs={3} md={2}>{stock.c}</Col>
               </Row>
             )}
         </Grid>
