@@ -26,7 +26,6 @@ class App extends Component {
         this.setState({ [stockName]: value })
       });
       let history_name = 'history_' + stockName;
-      console.log(history_name);
       this.socket.on(history_name, (array_strings) => {
         let list = array_strings.map(value => JSON.parse(value));
         let histories=this.state.histories;
@@ -36,6 +35,9 @@ class App extends Component {
     });
     this.socket.on('error', (error) => {
       this.setState({ ['error']: error })
+    });
+    this.socket.on('open', (open) => {
+      this.setState({ ['open']: open })
     });
   }
 
@@ -53,7 +55,7 @@ class App extends Component {
       'TSLA': [],
       'F': []
     },
-    selectedStock: null
+    selectedStock: null,
   };
 
 
@@ -63,9 +65,10 @@ class App extends Component {
       <div className="App">
         <div className="App-header">
           <h2>Test for AcidLabs</h2>
+          <h1>{state.open}</h1>
         </div>
-        {state.error && state.error.show === true && <Error error={state.error} />}
-        {state.message && <Message value={state.message} />}
+        {state.error && state.error.show === true && <Error error={state.error} /> || 
+         state.open === false && <Message title={'The market is closed'} message={'Show last Update'} />}
         <Stocks onSelectStock={(stock) => this.setState({ selectedStock: stock })} stocks={stocksNames.map(stockName => state[stockName])} />
         {state.selectedStock && <History  onClick={() => this.setState({selectedStock:null})} value={state.histories[state.selectedStock]} />}
       </div>

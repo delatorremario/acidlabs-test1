@@ -3,5 +3,5 @@ import {Alert} from 'react-bootstrap';
 
 export default ({ title, message }) =>
     <Alert bsStyle="warning">
-        <strong>{title}</strong> {message}
+        <strong>{title}</strong> <p>{message}</p>
     </Alert>
