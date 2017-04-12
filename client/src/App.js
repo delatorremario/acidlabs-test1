@@ -12,7 +12,11 @@ const stocksNames = ['AAPL', 'ABC', 'MSFT', 'TSLA', 'F'];
 class App extends Component {
 
   componentDidMount() {
-    this.socket = io('http://localhost:8000');
+    //this.socket = io('http://localhost:8000');
+    this.socket = io('https://acid-labs-server.herokuapp.com');
+ 
+
+    
     this.socket.on('connect',() => this.setState({ ['error']:{}}));
     this.socket.on('connect_error', () => this.setState({ ['error']: { title: 'API not connected', message: '', show: true } }));
 
